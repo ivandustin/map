@@ -1,30 +1,35 @@
+#!/usr/bin/env node
+const package   = require('./package.json')
 const path      = require('path')
 const fs        = require('fs')
+const argparse  = require('argparse')
+const expand    = require('./src/expand')
 const load      = require('./src/load')
 const get_words = require('./src/get-words')
 const map       = require('./src/map')
-const read      = require('./src/read')
 const save      = require('./src/save')
 const lexicon   = require('../lexicon/lexicon.json')
-const input     = path.join(__dirname, '..', 'selection', 'books')
 const output    = 'mapping.json'
-const wordsfile = 'words.json'
 const undeffile = 'undefined.json'
 
 function main() {
-    let words = null
-    if (fs.existsSync(wordsfile)) {
-        words = read(wordsfile)
-    } else {
-        words = get_words(load(input))
-        save(wordsfile, words)
-    }
+    let args  = parse()
+    let input = expand(args.file)
+    let words = get_words(load(input))
     let { mapping, undef } = map(words, lexicon)
     save(output, mapping)
     save(undeffile, undef)
     console.log('Words', words.length)
     console.log('Defined', mapping.length)
     console.log('Undefined', undef.length)
+}
+
+function parse() {
+    let { description, version } = package
+    let parser = new argparse.ArgumentParser({ description })
+    parser.add_argument('-V', '--version', { help: 'show version information and exit', action: 'version', version })
+    parser.add_argument('file',            { help: 'selection file as input', nargs: '+' })
+    return parser.parse_args()
 }
 
 main()

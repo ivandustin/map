@@ -1,19 +1,20 @@
-const { same } = require('collatia')
+const { deviation } = require('collatia')
+const max_deviation = 0.2
 
 function map(words, lexicon) {
     let undef   = []
-    let mapping =  words.map(function(word) {
-        let entry  = lexicon.find(entry => same(word, entry.greek))
-        let result = null
-        if (entry) {
-            let lexeme = entry.greek
-            let greek  = word
-            result     = { greek, lexeme }
-        } else {
-            undef.push(word)
-            console.error('Not found', word)
+    let mapping = words.map(function(greek) {
+        let deviations    = lexicon.map(entry => deviation(greek, entry.greek))
+        let min_deviation = Math.min(...deviations)
+        let lexemes       = []
+        if (min_deviation <= max_deviation)
+            lexemes = lexicon.filter((entry, index)=> deviations[index] == min_deviation).map(entry => entry.greek)
+        if (lexemes.length == 0) {
+            undef.push(greek)
+            console.error('Not found', greek)
+            return
         }
-        return result
+        return { greek, lexemes }
     }).filter(identity)
     return { mapping, undef }
 }

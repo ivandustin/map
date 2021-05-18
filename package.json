@@ -1,13 +1,17 @@
 {
-    "name": "mapping",
-    "description": "",
+    "name": "mapia",
+    "description": "Map words to lexicon",
     "version": "0.1.0",
     "license": "GPL-3.0-or-later",
     "repository": {
         "type": "git",
-        "url": "https://github.com/ivandustin/mapping"
+        "url": "https://github.com/ivandustin/map"
     },
     "dependencies": {
-        "collatia": "^0.1.7"
+        "argparse": "^2.0.1",
+        "collatia": "^0.1.8"
+    },
+    "bin": {
+        "map": "index.js"
     }
 }
